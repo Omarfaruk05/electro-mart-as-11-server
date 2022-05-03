@@ -12,10 +12,6 @@ app.use(express.json());
 //electroMart
 //QXSy6evzp9RpaJyK
 
-// DB_USER=electroMart
-// DB_PASS=QXSy6evzp9RpaJyK 
-
-
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.muwf8.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
