@@ -32,6 +32,19 @@ async function run() {
             const query = {_id: ObjectId(id)};
             const product = await productsCollection.findOne(query);
             res.send(product);
+        });
+
+        app.post('/product', async(req, res)=> {
+            const newService = req.body;
+            const result = await productsCollection.insertOne(newService);
+            res.send(result);
+        })
+
+        app.delete('/product/:id', async(req, res) => {
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)};
+            const result =  await productsCollection.deleteOne(query);
+            res.send(result);
         })
     }
 
