@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const query = require('express/lib/middleware/query');
 const port = process.env.PORT || 5000;
 
 const app = express();
@@ -19,7 +20,8 @@ async function run() {
     try{
         await client.connect();
         const productsCollection = client.db('electro-mart').collection('products');
-        
+      
+
         app.get('/product', async(req, res) => {
             const query = {};
             const cursor = productsCollection.find(query);
@@ -38,6 +40,23 @@ async function run() {
             const newService = req.body;
             const result = await productsCollection.insertOne(newService);
             res.send(result);
+        });
+
+        app.put('/product/:id', async(req, res) => {
+            const id = req.params.id;
+            console.log(id);
+            const updatedQuantity = req.body;
+            console.log(updatedQuantity)
+            const fliter = {_id: ObjectId(id)};
+            const options = {upsert: true};
+            const updatedDoc = {
+                $set:{
+                    quantity : updatedQuantity.quantity
+                }
+            };
+            const result = await productsCollection.updateOne(fliter, updatedDoc, options);
+            res.send(result);
+
         })
 
         app.delete('/product/:id', async(req, res) => {
@@ -45,7 +64,7 @@ async function run() {
             const query = {_id: ObjectId(id)};
             const result =  await productsCollection.deleteOne(query);
             res.send(result);
-        })
+        });
     }
 
     finally{
