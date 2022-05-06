@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const query = require('express/lib/middleware/query');
@@ -20,6 +21,14 @@ async function run() {
     try{
         await client.connect();
         const productsCollection = client.db('electro-mart').collection('products');
+
+        app.post('/login', (req, res) => {
+            const user = req.body;
+            const token = jwt.sign(user, process.env.ACCESS_TOKEN, {
+                expiresIn: '1d'
+            })
+            res.send({token});
+        })
       
 
         app.get('/product', async(req, res) => {
@@ -44,7 +53,6 @@ async function run() {
 
         app.put('/product/:id', async(req, res) => {
             const id = req.params.id;
-            console.log(id);
             const updatedQuantity = req.body;
             console.log(updatedQuantity)
             const fliter = {_id: ObjectId(id)};
