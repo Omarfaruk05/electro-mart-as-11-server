@@ -11,8 +11,22 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-//electroMart
-//QXSy6evzp9RpaJyK
+function verifyJWT(req, res, next){
+    const authHeader  = req.headers.authorization;
+    if(!authHeader){
+      return res.status(401).send({message: 'Unauthorized Access'})  
+    }
+    const token = authHeader.split(' ')[1];
+    jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded)=> {
+      if(err){
+        return res.status(403).send({message: 'Forbiden Access'})  
+      }  
+      console.log('decoded', decoded)
+      req.decoded = decoded;
+      next()
+    })
+    
+}
 
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.muwf8.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
@@ -35,15 +49,19 @@ async function run() {
             const products = await cursor.toArray();
             res.send(products);
         });
-        app.get('/addedProduct', async(req, res) => {
-            const authHeader  = req.headers.authorization;
-            console.log(authHeader);
-            const email = req.query;
-            const query = email;
-            console.log(query)
-            const cursor = productsCollection.find(query);
-            const addedProducts = await cursor.toArray();
-            res.send(addedProducts);
+        app.get('/addedProduct', verifyJWT, async(req, res) => {
+            const decodedEmail = req.decoded.email
+            const email = req.query.email;
+            console.log(email , decodedEmail)
+            if(email === decodedEmail){
+                const query = {email: email};
+                const cursor = productsCollection.find(query);
+                const addedProducts = await cursor.toArray();
+                res.send(addedProducts);
+            }
+            else{
+                res.status(403).send({message: 'Forbiden Email'})
+            }
         });
 
         app.get('/product/:id', async(req, res) => {
