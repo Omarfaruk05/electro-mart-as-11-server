@@ -36,6 +36,8 @@ async function run() {
             res.send(products);
         });
         app.get('/addedProduct', async(req, res) => {
+            const authHeader  = req.headers.authorization;
+            console.log(authHeader);
             const email = req.query;
             const query = email;
             console.log(query)
