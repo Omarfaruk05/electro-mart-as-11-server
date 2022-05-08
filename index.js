@@ -29,13 +29,19 @@ async function run() {
             })
             res.send({token});
         })
-      
-
         app.get('/product', async(req, res) => {
             const query = {};
             const cursor = productsCollection.find(query);
             const products = await cursor.toArray();
             res.send(products);
+        });
+        app.get('/addedProduct', async(req, res) => {
+            const email = req.query;
+            const query = email;
+            console.log(query)
+            const cursor = productsCollection.find(query);
+            const addedProducts = await cursor.toArray();
+            res.send(addedProducts);
         });
 
         app.get('/product/:id', async(req, res) => {
